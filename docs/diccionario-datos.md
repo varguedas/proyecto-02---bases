@@ -75,3 +75,4 @@
 | folio_unico | VARCHAR(80) | Folio institucional |
 | hash_seguridad | TEXT | Hash SHA-256 |
 | fecha_emision | TIMESTAMP | Fecha de emisión |
+##

@@ -31,7 +31,7 @@ El sistema implementa arquitectura MVC (Modelo Vista Controlador).
 ```
 
 ---
-
+##
 # Tecnologías Utilizadas
 
 | Tecnología | Uso |
