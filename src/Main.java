@@ -1,20 +1,19 @@
-import controllers.AuthController;
+import controllers.SecretariaController;
 
 public class Main {
 
     public static void main(String[] args) {
 
-        AuthController authController = new AuthController();
+        SecretariaController secretariaController =
+            new SecretariaController();
 
-        boolean autenticado = authController.login(
-            "admin@air.ac.cr",
-            "admin123"
+        secretariaController.registrarAsambleista(
+            "Ana Ruiz",
+            "123456789",
+            "Docente",
+            "ACTIVO"
         );
 
-        if (autenticado) {
-            System.out.println("Acceso concedido al sistema.");
-        } else {
-            System.out.println("Acceso denegado.");
-        }
+        secretariaController.mostrarAsambleistas();
     }
 }
