@@ -1,19 +1,19 @@
-import controllers.SecretariaController;
+import controllers.LegislativoController;
+import java.time.LocalDate;
 
 public class Main {
 
     public static void main(String[] args) {
 
-        SecretariaController secretariaController =
-            new SecretariaController();
+        LegislativoController legislativoController =
+            new LegislativoController();
 
-        secretariaController.registrarAsambleista(
-            "Ana Ruiz",
-            "123456789",
-            "Docente",
-            "ACTIVO"
+        legislativoController.registrarNormativa(
+            "Reglamento AIR de prueba",
+            "Normativa registrada desde Java para prueba del módulo legislativo.",
+            LocalDate.of(2026, 5, 14)
         );
 
-        secretariaController.mostrarAsambleistas();
+        legislativoController.mostrarNormativas();
     }
 }
