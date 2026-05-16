@@ -3,6 +3,8 @@ package views;
 import javax.swing.*;
 import java.awt.*;
 import java.util.List;
+import controllers.AuthController;
+import models.Usuario;
 import models.Asambleista;
 import models.AsambleistaDAO;
 import models.Normativa;
@@ -14,7 +16,9 @@ public class MenuPrincipalView extends JFrame {
 
     public MenuPrincipalView() {
 
-        setTitle("Proyecto AIR - Menú Principal");
+        Usuario usuario = AuthController.getUsuarioAutenticado();
+
+        setTitle("Proyecto AIR - Menú Principal | Rol: " + usuario.getRol());
         setSize(700, 450);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLocationRelativeTo(null);
@@ -26,14 +30,24 @@ public class MenuPrincipalView extends JFrame {
         areaResultado.setEditable(false);
 
         JPanel panelBotones = new JPanel();
+
         panelBotones.add(btnAsambleistas);
-        panelBotones.add(btnNormativas);
+
+        if (!usuario.getRol().equalsIgnoreCase("ASAMBLEISTA")) {
+            panelBotones.add(btnNormativas);
+        }
 
         add(panelBotones, BorderLayout.NORTH);
         add(new JScrollPane(areaResultado), BorderLayout.CENTER);
 
         btnAsambleistas.addActionListener(e -> listarAsambleistas());
         btnNormativas.addActionListener(e -> listarNormativas());
+
+        areaResultado.setText(
+            "Bienvenido: " + usuario.getNombre() + "\n" +
+            "Rol activo: " + usuario.getRol() + "\n\n" +
+            "Seleccione una opción del menú superior."
+        );
     }
 
     private void listarAsambleistas() {
