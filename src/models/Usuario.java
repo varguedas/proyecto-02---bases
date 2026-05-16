@@ -6,12 +6,20 @@ public class Usuario {
     private String nombre;
     private String correo;
     private String passwordHash;
+    private String rol;
 
-    public Usuario(int idUsuario, String nombre, String correo, String passwordHash) {
+    public Usuario(
+        int idUsuario,
+        String nombre,
+        String correo,
+        String passwordHash,
+        String rol
+    ) {
         this.idUsuario = idUsuario;
         this.nombre = nombre;
         this.correo = correo;
         this.passwordHash = passwordHash;
+        this.rol = rol;
     }
 
     public int getIdUsuario() {
@@ -28,5 +36,9 @@ public class Usuario {
 
     public String getPasswordHash() {
         return passwordHash;
+    }
+
+    public String getRol() {
+        return rol;
     }
 }
