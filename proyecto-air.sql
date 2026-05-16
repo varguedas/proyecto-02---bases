@@ -511,3 +511,30 @@ VALUES
 (1, 2, 4, 'Articulo 1', 'Texto base del articulo 1.', 1, 1),
 (1, 3, 5, 'a)', 'Texto base del inciso a).', 1, 1),
 (1, 4, 6, 'i.', 'Texto base del sub-inciso i.', 1, 1);
+
+
+-- Trigger de auditoría básico
+CREATE OR REPLACE FUNCTION fn_auditoria_basica()
+RETURNS TRIGGER AS $$
+BEGIN
+    INSERT INTO sys_log_auditoria (
+        accion,
+        tabla_afectada,
+        detalle,
+        registro_id
+    )
+    VALUES (
+        TG_OP,
+        TG_TABLE_NAME,
+        'Cambio realizado automáticamente por trigger',
+        COALESCE(NEW.asambleista_id, OLD.asambleista_id)
+    );
+
+    RETURN COALESCE(NEW, OLD);
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE TRIGGER tg_auditoria_asambleista
+AFTER INSERT OR UPDATE OR DELETE ON asambleista
+FOR EACH ROW
+EXECUTE FUNCTION fn_auditoria_basica();
