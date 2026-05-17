@@ -1,14 +1,15 @@
 package views;
 
-import controllers.AuthController;
+import javax.swing.*;
 import java.awt.*;
 import java.util.List;
-import javax.swing.*;
+
+import controllers.AuthController;
+import models.Usuario;
 import models.Asambleista;
 import models.AsambleistaDAO;
 import models.Normativa;
 import models.NormativaDAO;
-import models.Usuario;
 
 public class MenuPrincipalView extends JFrame {
 
@@ -20,13 +21,14 @@ public class MenuPrincipalView extends JFrame {
         usuario = AuthController.getUsuarioAutenticado();
 
         setTitle("Proyecto AIR - Menú Principal | Rol: " + usuario.getRol());
-        setSize(850, 520);
+        setSize(900, 540);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLocationRelativeTo(null);
 
         JButton btnAsambleistas = new JButton("Listar Asambleístas");
         JButton btnNormativas = new JButton("Listar Normativas");
         JButton btnEditarNormativa = new JButton("Editar Normativa");
+        JButton btnArbolNormativo = new JButton("Ver Árbol Normativo");
 
         areaResultado = new JTextArea();
         areaResultado.setEditable(false);
@@ -37,6 +39,7 @@ public class MenuPrincipalView extends JFrame {
 
         if (!usuario.getRol().equalsIgnoreCase("ASAMBLEISTA")) {
             panelBotones.add(btnNormativas);
+            panelBotones.add(btnArbolNormativo);
         }
 
         if (puedeEditarNormativa()) {
@@ -49,6 +52,7 @@ public class MenuPrincipalView extends JFrame {
         btnAsambleistas.addActionListener(e -> listarAsambleistas());
         btnNormativas.addActionListener(e -> listarNormativas());
         btnEditarNormativa.addActionListener(e -> editarNormativa());
+        btnArbolNormativo.addActionListener(e -> abrirArbolNormativo());
 
         areaResultado.setText(
             "Bienvenido: " + usuario.getNombre() + "\n" +
@@ -170,5 +174,11 @@ public class MenuPrincipalView extends JFrame {
                 "El ID debe ser un número válido."
             );
         }
+    }
+
+    private void abrirArbolNormativo() {
+
+        NormativaTreeView normativaTreeView = new NormativaTreeView();
+        normativaTreeView.setVisible(true);
     }
 }
