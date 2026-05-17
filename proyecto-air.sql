@@ -600,3 +600,47 @@ BEGIN
     );
 END;
 $$ LANGUAGE plpgsql;
+
+DROP TABLE IF EXISTS normativa_arbol CASCADE;
+
+CREATE TABLE normativa_arbol (
+    id_elemento SERIAL PRIMARY KEY,
+    id_padre INT REFERENCES normativa_arbol(id_elemento),
+    tipo VARCHAR(40) NOT NULL,
+    titulo VARCHAR(200) NOT NULL,
+    estado_vigencia VARCHAR(30) NOT NULL DEFAULT 'VIGENTE',
+    orden INT NOT NULL DEFAULT 0
+);
+
+INSERT INTO normativa_arbol (
+    id_elemento,
+    id_padre,
+    tipo,
+    titulo,
+    estado_vigencia,
+    orden
+)
+VALUES
+(1, NULL, 'Reglamento', 'Reglamento AIR', 'VIGENTE', 1),
+
+(2, 1, 'Título', 'Título I - Disposiciones Generales', 'VIGENTE', 1),
+(3, 2, 'Capítulo', 'Capítulo I - Organización', 'VIGENTE', 1),
+
+(4, 3, 'Artículo', 'Artículo 1 - Integración original', 'HISTORICO', 1),
+(5, 4, 'Inciso', 'Inciso a - Texto anterior', 'HISTORICO', 1),
+
+(6, 3, 'Artículo', 'Artículo 1 - Integración reformada', 'VIGENTE', 2),
+(7, 6, 'Inciso', 'Inciso a - Texto vigente', 'VIGENTE', 1),
+(8, 6, 'Inciso', 'Inciso b - Texto vigente', 'VIGENTE', 2),
+
+(9, 2, 'Capítulo', 'Capítulo II - Funcionamiento', 'VIGENTE', 2),
+(10, 9, 'Artículo', 'Artículo 2 - Sesiones ordinarias', 'VIGENTE', 1),
+
+(11, 1, 'Título', 'Título II - Reformas y Vigencia', 'VIGENTE', 2),
+(12, 11, 'Capítulo', 'Capítulo I - Reformas', 'VIGENTE', 1),
+(13, 12, 'Artículo', 'Artículo 3 - Procedimiento de reforma', 'VIGENTE', 1);
+
+SELECT setval(
+    pg_get_serial_sequence('normativa_arbol', 'id_elemento'),
+    (SELECT MAX(id_elemento) FROM normativa_arbol)
+);
