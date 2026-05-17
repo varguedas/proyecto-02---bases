@@ -6,6 +6,7 @@ import models.UsuarioDAO;
 public class AuthController {
 
     private UsuarioDAO usuarioDAO;
+    private static Usuario usuarioAutenticado;
 
     public AuthController() {
         usuarioDAO = new UsuarioDAO();
@@ -17,7 +18,12 @@ public class AuthController {
 
         if (usuario != null) {
 
-            System.out.println("Bienvenido " + usuario.getNombre());
+            usuarioAutenticado = usuario;
+
+            System.out.println(
+                "Bienvenido " + usuario.getNombre() +
+                " | Rol: " + usuario.getRol()
+            );
 
             return true;
         }
@@ -25,5 +31,9 @@ public class AuthController {
         System.out.println("Credenciales inválidas");
 
         return false;
+    }
+
+    public static Usuario getUsuarioAutenticado() {
+        return usuarioAutenticado;
     }
 }
