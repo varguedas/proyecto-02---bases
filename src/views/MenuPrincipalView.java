@@ -33,6 +33,7 @@ public class MenuPrincipalView extends JFrame {
         JButton btnNormativas = new JButton("Listar Normativas");
         JButton btnEditarNormativa = new JButton("Editar Normativa");
         JButton btnArbolNormativo = new JButton("Ver Árbol Normativo");
+        JButton btnNombramientos = new JButton("Gestionar Nombramientos");
 
         txtBusquedaAsambleista = new JTextField(18);
         comboSectores = new JComboBox<>();
@@ -60,6 +61,10 @@ public class MenuPrincipalView extends JFrame {
             panelBotones.add(btnEditarNormativa);
         }
 
+        if (puedeGestionarNombramientos()) {
+            panelBotones.add(btnNombramientos);
+        }
+
         add(panelBotones, BorderLayout.NORTH);
         add(new JScrollPane(areaResultado), BorderLayout.CENTER);
 
@@ -68,6 +73,7 @@ public class MenuPrincipalView extends JFrame {
         btnNormativas.addActionListener(e -> listarNormativas());
         btnEditarNormativa.addActionListener(e -> editarNormativa());
         btnArbolNormativo.addActionListener(e -> abrirArbolNormativo());
+        btnNombramientos.addActionListener(e -> abrirNombramientos());
 
         areaResultado.setText(
             "Bienvenido: " + usuario.getNombre() + "\n" +
@@ -241,5 +247,19 @@ public class MenuPrincipalView extends JFrame {
 
         NormativaTreeView normativaTreeView = new NormativaTreeView();
         normativaTreeView.setVisible(true);
+    }
+
+    private boolean puedeGestionarNombramientos() {
+
+        String rol = usuario.getRol();
+
+        return rol.equalsIgnoreCase("ADMIN") ||
+            rol.equalsIgnoreCase("SECRETARIA");
+    }
+
+    private void abrirNombramientos() {
+
+        NombramientoView nombramientoView = new NombramientoView();
+        nombramientoView.setVisible(true);
     }
 }
