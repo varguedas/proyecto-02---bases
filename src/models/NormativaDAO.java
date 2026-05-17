@@ -78,4 +78,35 @@ public class NormativaDAO {
 
         return lista;
     }
+    public boolean actualizarDescripcionNormativa(
+        int idNormativa,
+        String nuevaDescripcion
+        ) {
+
+        String sql = """
+            UPDATE normativa
+            SET descripcion = ?
+            WHERE id_normativa = ?
+        """;
+
+        try (
+            Connection connection = DatabaseConnection.connect();
+            PreparedStatement statement = connection.prepareStatement(sql)
+        ) {
+
+            statement.setString(1, nuevaDescripcion);
+            statement.setInt(2, idNormativa);
+
+            int filas = statement.executeUpdate();
+
+            return filas > 0;
+
+        } catch (Exception e) {
+
+            System.out.println("Error actualizando normativa:");
+            e.printStackTrace();
+
+            return false;
+        }
+    }
 }
