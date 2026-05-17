@@ -78,10 +78,11 @@ public class NormativaDAO {
 
         return lista;
     }
+
     public boolean actualizarDescripcionNormativa(
         int idNormativa,
         String nuevaDescripcion
-        ) {
+    ) {
 
         String sql = """
             UPDATE normativa

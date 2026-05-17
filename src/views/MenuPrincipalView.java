@@ -1,30 +1,32 @@
 package views;
 
-import javax.swing.*;
+import controllers.AuthController;
 import java.awt.*;
 import java.util.List;
-import controllers.AuthController;
-import models.Usuario;
+import javax.swing.*;
 import models.Asambleista;
 import models.AsambleistaDAO;
 import models.Normativa;
 import models.NormativaDAO;
+import models.Usuario;
 
 public class MenuPrincipalView extends JFrame {
 
     private JTextArea areaResultado;
+    private Usuario usuario;
 
     public MenuPrincipalView() {
 
-        Usuario usuario = AuthController.getUsuarioAutenticado();
+        usuario = AuthController.getUsuarioAutenticado();
 
         setTitle("Proyecto AIR - Menú Principal | Rol: " + usuario.getRol());
-        setSize(700, 450);
+        setSize(850, 520);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLocationRelativeTo(null);
 
         JButton btnAsambleistas = new JButton("Listar Asambleístas");
         JButton btnNormativas = new JButton("Listar Normativas");
+        JButton btnEditarNormativa = new JButton("Editar Normativa");
 
         areaResultado = new JTextArea();
         areaResultado.setEditable(false);
@@ -37,17 +39,30 @@ public class MenuPrincipalView extends JFrame {
             panelBotones.add(btnNormativas);
         }
 
+        if (puedeEditarNormativa()) {
+            panelBotones.add(btnEditarNormativa);
+        }
+
         add(panelBotones, BorderLayout.NORTH);
         add(new JScrollPane(areaResultado), BorderLayout.CENTER);
 
         btnAsambleistas.addActionListener(e -> listarAsambleistas());
         btnNormativas.addActionListener(e -> listarNormativas());
+        btnEditarNormativa.addActionListener(e -> editarNormativa());
 
         areaResultado.setText(
             "Bienvenido: " + usuario.getNombre() + "\n" +
             "Rol activo: " + usuario.getRol() + "\n\n" +
             "Seleccione una opción del menú superior."
         );
+    }
+
+    private boolean puedeEditarNormativa() {
+
+        String rol = usuario.getRol();
+
+        return rol.equalsIgnoreCase("ADMIN") ||
+               rol.equalsIgnoreCase("SECRETARIA");
     }
 
     private void listarAsambleistas() {
@@ -80,6 +95,79 @@ public class MenuPrincipalView extends JFrame {
                 n.getIdNormativa() + " | " +
                 n.getTitulo() + " | " +
                 n.getFechaAprobacion() + "\n"
+            );
+        }
+    }
+
+    private void editarNormativa() {
+
+        if (!puedeEditarNormativa()) {
+
+            JOptionPane.showMessageDialog(
+                this,
+                "Acceso denegado. Su rol no permite editar normativa."
+            );
+
+            return;
+        }
+
+        String idTexto = JOptionPane.showInputDialog(
+            this,
+            "Ingrese el ID de la normativa a editar:"
+        );
+
+        if (idTexto == null || idTexto.isBlank()) {
+            return;
+        }
+
+        String nuevaDescripcion = JOptionPane.showInputDialog(
+            this,
+            "Ingrese la nueva descripción de la normativa:"
+        );
+
+        if (nuevaDescripcion == null || nuevaDescripcion.isBlank()) {
+
+            JOptionPane.showMessageDialog(
+                this,
+                "La descripción no puede estar vacía."
+            );
+
+            return;
+        }
+
+        try {
+
+            int idNormativa = Integer.parseInt(idTexto);
+
+            NormativaDAO dao = new NormativaDAO();
+
+            boolean actualizada = dao.actualizarDescripcionNormativa(
+                idNormativa,
+                nuevaDescripcion
+            );
+
+            if (actualizada) {
+
+                JOptionPane.showMessageDialog(
+                    this,
+                    "Normativa actualizada correctamente."
+                );
+
+                listarNormativas();
+
+            } else {
+
+                JOptionPane.showMessageDialog(
+                    this,
+                    "No se encontró la normativa indicada."
+                );
+            }
+
+        } catch (NumberFormatException e) {
+
+            JOptionPane.showMessageDialog(
+                this,
+                "El ID debe ser un número válido."
             );
         }
     }
