@@ -77,4 +77,98 @@ public class AsambleistaDAO {
 
         return lista;
     }
+    public List<Asambleista> buscarAsambleistas(
+        String textoBusqueda,
+        String sectorSeleccionado
+    ) {
+
+        List<Asambleista> lista = new ArrayList<>();
+
+        String sql = """
+            SELECT id_asambleista, nombre_completo, cedula, sector, estado
+            FROM asambleista
+            WHERE (
+                LOWER(nombre_completo) LIKE ?
+                OR LOWER(cedula) LIKE ?
+            )
+            AND (
+                ? = 'TODOS'
+                OR sector = ?
+            )
+            ORDER BY nombre_completo
+        """;
+
+        try (
+            Connection connection = DatabaseConnection.connect();
+            PreparedStatement statement = connection.prepareStatement(sql)
+        ) {
+
+            String busqueda = "%" + textoBusqueda.toLowerCase().trim() + "%";
+
+            if (textoBusqueda == null || textoBusqueda.isBlank()) {
+                busqueda = "%";
+            }
+
+            if (sectorSeleccionado == null || sectorSeleccionado.isBlank()) {
+                sectorSeleccionado = "TODOS";
+            }
+
+            statement.setString(1, busqueda);
+            statement.setString(2, busqueda);
+            statement.setString(3, sectorSeleccionado);
+            statement.setString(4, sectorSeleccionado);
+
+            ResultSet resultSet = statement.executeQuery();
+
+            while (resultSet.next()) {
+
+                Asambleista asambleista = new Asambleista(
+                    resultSet.getInt("id_asambleista"),
+                    resultSet.getString("nombre_completo"),
+                    resultSet.getString("cedula"),
+                    resultSet.getString("sector"),
+                    resultSet.getString("estado")
+                );
+
+                lista.add(asambleista);
+            }
+
+        } catch (Exception e) {
+
+            System.out.println("Error buscando asambleístas:");
+            e.printStackTrace();
+        }
+
+        return lista;
+    }
+
+    public List<String> listarSectores() {
+
+        List<String> sectores = new ArrayList<>();
+
+        String sql = """
+            SELECT DISTINCT sector
+            FROM asambleista
+            WHERE sector IS NOT NULL
+            ORDER BY sector
+        """;
+
+        try (
+            Connection connection = DatabaseConnection.connect();
+            PreparedStatement statement = connection.prepareStatement(sql);
+            ResultSet resultSet = statement.executeQuery()
+        ) {
+
+            while (resultSet.next()) {
+                sectores.add(resultSet.getString("sector"));
+            }
+
+        } catch (Exception e) {
+
+            System.out.println("Error listando sectores:");
+            e.printStackTrace();
+        }
+
+        return sectores;
+    }
 }

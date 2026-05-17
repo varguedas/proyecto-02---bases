@@ -16,19 +16,28 @@ public class MenuPrincipalView extends JFrame {
     private JTextArea areaResultado;
     private Usuario usuario;
 
+    private JTextField txtBusquedaAsambleista;
+    private JComboBox<String> comboSectores;
+
     public MenuPrincipalView() {
 
         usuario = AuthController.getUsuarioAutenticado();
 
         setTitle("Proyecto AIR - Menú Principal | Rol: " + usuario.getRol());
-        setSize(900, 540);
+        setSize(950, 580);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLocationRelativeTo(null);
 
         JButton btnAsambleistas = new JButton("Listar Asambleístas");
+        JButton btnBuscarAsambleistas = new JButton("Buscar Asambleístas");
         JButton btnNormativas = new JButton("Listar Normativas");
         JButton btnEditarNormativa = new JButton("Editar Normativa");
         JButton btnArbolNormativo = new JButton("Ver Árbol Normativo");
+
+        txtBusquedaAsambleista = new JTextField(18);
+        comboSectores = new JComboBox<>();
+
+        cargarSectores();
 
         areaResultado = new JTextArea();
         areaResultado.setEditable(false);
@@ -36,6 +45,11 @@ public class MenuPrincipalView extends JFrame {
         JPanel panelBotones = new JPanel();
 
         panelBotones.add(btnAsambleistas);
+        panelBotones.add(new JLabel("Buscar:"));
+        panelBotones.add(txtBusquedaAsambleista);
+        panelBotones.add(new JLabel("Sector:"));
+        panelBotones.add(comboSectores);
+        panelBotones.add(btnBuscarAsambleistas);
 
         if (!usuario.getRol().equalsIgnoreCase("ASAMBLEISTA")) {
             panelBotones.add(btnNormativas);
@@ -50,6 +64,7 @@ public class MenuPrincipalView extends JFrame {
         add(new JScrollPane(areaResultado), BorderLayout.CENTER);
 
         btnAsambleistas.addActionListener(e -> listarAsambleistas());
+        btnBuscarAsambleistas.addActionListener(e -> buscarAsambleistas());
         btnNormativas.addActionListener(e -> listarNormativas());
         btnEditarNormativa.addActionListener(e -> editarNormativa());
         btnArbolNormativo.addActionListener(e -> abrirArbolNormativo());
@@ -69,12 +84,58 @@ public class MenuPrincipalView extends JFrame {
                rol.equalsIgnoreCase("SECRETARIA");
     }
 
+    private void cargarSectores() {
+
+        AsambleistaDAO dao = new AsambleistaDAO();
+
+        comboSectores.addItem("TODOS");
+
+        List<String> sectores = dao.listarSectores();
+
+        for (String sector : sectores) {
+            comboSectores.addItem(sector);
+        }
+    }
+
     private void listarAsambleistas() {
 
         AsambleistaDAO dao = new AsambleistaDAO();
         List<Asambleista> lista = dao.listarAsambleistas();
 
-        areaResultado.setText("ASAMBLEÍSTAS REGISTRADOS\n\n");
+        mostrarAsambleistas(lista, "ASAMBLEÍSTAS REGISTRADOS");
+    }
+
+    private void buscarAsambleistas() {
+
+        String textoBusqueda = txtBusquedaAsambleista.getText();
+        String sectorSeleccionado =
+            comboSectores.getSelectedItem().toString();
+
+        AsambleistaDAO dao = new AsambleistaDAO();
+
+        List<Asambleista> lista = dao.buscarAsambleistas(
+            textoBusqueda,
+            sectorSeleccionado
+        );
+
+        mostrarAsambleistas(lista, "RESULTADOS DE BÚSQUEDA");
+    }
+
+    private void mostrarAsambleistas(
+        List<Asambleista> lista,
+        String titulo
+    ) {
+
+        areaResultado.setText(titulo + "\n\n");
+
+        if (lista.isEmpty()) {
+
+            areaResultado.append(
+                "No se encontraron asambleístas con los criterios indicados.\n"
+            );
+
+            return;
+        }
 
         for (Asambleista a : lista) {
             areaResultado.append(
