@@ -644,3 +644,63 @@ SELECT setval(
     pg_get_serial_sequence('normativa_arbol', 'id_elemento'),
     (SELECT MAX(id_elemento) FROM normativa_arbol)
 );
+
+CREATE TABLE IF NOT EXISTS nombramiento (
+    id_nombramiento SERIAL PRIMARY KEY,
+    id_asambleista INT NOT NULL REFERENCES asambleista(id_asambleista),
+    sector VARCHAR(100) NOT NULL,
+    fecha_inicio DATE NOT NULL,
+    fecha_fin DATE,
+    estado VARCHAR(40) NOT NULL DEFAULT 'VIGENTE',
+    fecha_registro TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    CONSTRAINT chk_fechas_nombramiento
+        CHECK (fecha_fin IS NULL OR fecha_fin >= fecha_inicio)
+);
+
+CREATE OR REPLACE FUNCTION sp_registrar_nombramiento(
+    p_id_asambleista INT,
+    p_sector VARCHAR,
+    p_fecha_inicio DATE,
+    p_fecha_fin DATE
+)
+RETURNS VOID AS $$
+BEGIN
+    IF EXISTS (
+        SELECT 1
+        FROM nombramiento
+        WHERE id_asambleista = p_id_asambleista
+          AND p_fecha_inicio <= COALESCE(fecha_fin, DATE '9999-12-31')
+          AND COALESCE(p_fecha_fin, DATE '9999-12-31') >= fecha_inicio
+    ) THEN
+        RAISE EXCEPTION 'No se puede registrar el nombramiento: existe traslape de fechas para este asambleísta.';
+    END IF;
+
+    INSERT INTO nombramiento (
+        id_asambleista,
+        sector,
+        fecha_inicio,
+        fecha_fin,
+        estado
+    )
+    VALUES (
+        p_id_asambleista,
+        p_sector,
+        p_fecha_inicio,
+        p_fecha_fin,
+        'VIGENTE'
+    );
+
+    INSERT INTO sys_log_auditoria (
+        accion,
+        tabla_afectada,
+        detalle,
+        registro_id
+    )
+    VALUES (
+        'INSERT',
+        'nombramiento',
+        'Nombramiento registrado mediante sp_registrar_nombramiento',
+        p_id_asambleista
+    );
+END;
+$$ LANGUAGE plpgsql;
