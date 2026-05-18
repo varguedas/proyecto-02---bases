@@ -539,48 +539,41 @@ AFTER INSERT OR UPDATE OR DELETE ON asambleista
 FOR EACH ROW
 EXECUTE FUNCTION fn_auditoria_basica();
 
--- Tabla de nombramientos para control histórico del asambleísta
-CREATE TABLE IF NOT EXISTS nombramiento (
-    id_nombramiento SERIAL PRIMARY KEY,
-    id_asambleista INT NOT NULL REFERENCES asambleista(id_asambleista),
-    sector VARCHAR(100) NOT NULL,
-    fecha_inicio DATE NOT NULL,
-    fecha_fin DATE,
-    estado VARCHAR(40) NOT NULL DEFAULT 'VIGENTE',
-    fecha_registro TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    CONSTRAINT chk_fechas_nombramiento
-        CHECK (fecha_fin IS NULL OR fecha_fin >= fecha_inicio)
-);
+
 
 -- Función para registrar nombramientos sin traslape de fechas
 CREATE OR REPLACE FUNCTION sp_registrar_nombramiento(
-    p_id_asambleista INT,
-    p_sector VARCHAR,
+    p_asambleista_id INT,
+    p_sector_id INT,
     p_fecha_inicio DATE,
     p_fecha_fin DATE
 )
 RETURNS VOID AS $$
 BEGIN
+
     IF EXISTS (
         SELECT 1
         FROM nombramiento
-        WHERE id_asambleista = p_id_asambleista
+        WHERE asambleista_id = p_asambleista_id
           AND p_fecha_inicio <= COALESCE(fecha_fin, DATE '9999-12-31')
           AND COALESCE(p_fecha_fin, DATE '9999-12-31') >= fecha_inicio
     ) THEN
-        RAISE EXCEPTION 'No se puede registrar el nombramiento: existe traslape de fechas para este asambleísta.';
+
+        RAISE EXCEPTION
+        'No se puede registrar el nombramiento: existe traslape de fechas para este asambleísta.';
+
     END IF;
 
     INSERT INTO nombramiento (
-        id_asambleista,
-        sector,
+        asambleista_id,
+        sector_id,
         fecha_inicio,
         fecha_fin,
         estado
     )
     VALUES (
-        p_id_asambleista,
-        p_sector,
+        p_asambleista_id,
+        p_sector_id,
         p_fecha_inicio,
         p_fecha_fin,
         'VIGENTE'
@@ -596,7 +589,8 @@ BEGIN
         'INSERT',
         'nombramiento',
         'Nombramiento registrado mediante sp_registrar_nombramiento',
-        p_id_asambleista
+        p_asambleista_id
     );
+
 END;
 $$ LANGUAGE plpgsql;
