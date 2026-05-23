@@ -698,3 +698,65 @@ BEGIN
     );
 END;
 $$ LANGUAGE plpgsql;
+
+
+-- Tablas sesiones, propuestas, votaciones y certificaciones
+
+CREATE TABLE IF NOT EXISTS sesion_legislativa (
+    id_sesion SERIAL PRIMARY KEY,
+    numero_sesion VARCHAR(50) NOT NULL UNIQUE,
+    fecha_sesion DATE NOT NULL,
+    tipo_sesion VARCHAR(50) NOT NULL,
+    estado VARCHAR(50) NOT NULL DEFAULT 'PROGRAMADA',
+    quorum_requerido INT NOT NULL,
+    descripcion TEXT
+);
+
+CREATE TABLE IF NOT EXISTS asistencia_sesion (
+    id_asistencia SERIAL PRIMARY KEY,
+    id_sesion INT NOT NULL REFERENCES sesion_legislativa(id_sesion),
+    id_asambleista INT NOT NULL REFERENCES asambleista(id_asambleista),
+    estado_asistencia VARCHAR(50) NOT NULL,
+    fecha_registro TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    CONSTRAINT uq_asistencia_sesion_asambleista
+        UNIQUE (id_sesion, id_asambleista)
+);
+
+CREATE TABLE IF NOT EXISTS propuesta_sesion (
+    id_propuesta SERIAL PRIMARY KEY,
+    id_sesion INT NOT NULL REFERENCES sesion_legislativa(id_sesion),
+    titulo VARCHAR(200) NOT NULL,
+    descripcion TEXT,
+    estado VARCHAR(50) NOT NULL DEFAULT 'PENDIENTE',
+    fecha_presentacion DATE NOT NULL DEFAULT CURRENT_DATE
+);
+
+CREATE TABLE IF NOT EXISTS votacion (
+    id_votacion SERIAL PRIMARY KEY,
+    id_propuesta INT NOT NULL REFERENCES propuesta_sesion(id_propuesta),
+    fecha_votacion TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    tipo_votacion VARCHAR(50) NOT NULL,
+    resultado VARCHAR(50),
+    votos_favor INT DEFAULT 0,
+    votos_contra INT DEFAULT 0,
+    abstenciones INT DEFAULT 0
+);
+
+CREATE TABLE IF NOT EXISTS voto_asambleista (
+    id_voto SERIAL PRIMARY KEY,
+    id_votacion INT NOT NULL REFERENCES votacion(id_votacion),
+    id_asambleista INT NOT NULL REFERENCES asambleista(id_asambleista),
+    voto VARCHAR(50) NOT NULL,
+    observacion TEXT,
+    CONSTRAINT uq_voto_asambleista_votacion
+        UNIQUE (id_votacion, id_asambleista)
+);
+
+CREATE TABLE IF NOT EXISTS certificacion_sprint3 (
+    id_certificacion SERIAL PRIMARY KEY,
+    tipo_certificacion VARCHAR(80) NOT NULL,
+    referencia_id INT NOT NULL,
+    contenido TEXT NOT NULL,
+    hash_seguridad TEXT,
+    fecha_emision TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
