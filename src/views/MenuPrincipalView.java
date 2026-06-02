@@ -87,16 +87,18 @@ public class MenuPrincipalView extends JFrame {
 
     private boolean puedeEditarNormativa() {
 
-    System.out.println("ROL DETECTADO: " + usuario.getRol());
+    String rol = usuario.getRol();
 
-    return true;
+    return rol.equalsIgnoreCase("ADMIN") ||
+           rol.equalsIgnoreCase("SECRETARIA");
 }
 
     private boolean puedeGestionarNombramientos() {
 
-    System.out.println("ROL DETECTADO: " + usuario.getRol());
+    String rol = usuario.getRol();
 
-    return true;
+    return rol.equalsIgnoreCase("ADMIN") ||
+           rol.equalsIgnoreCase("SECRETARIA");
 }
 
     private void cargarSectores() {
