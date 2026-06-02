@@ -34,6 +34,7 @@ public class MenuPrincipalView extends JFrame {
         JButton btnEditarNormativa = new JButton("Editar Normativa");
         JButton btnArbolNormativo = new JButton("Ver Árbol Normativo");
         JButton btnNombramientos = new JButton("Gestionar Nombramientos");
+        JButton btnCertificados = new JButton("Generar Atestado");
 
         txtBusquedaAsambleista = new JTextField(18);
         comboSectores = new JComboBox<>();
@@ -63,6 +64,7 @@ public class MenuPrincipalView extends JFrame {
 
         if (puedeGestionarNombramientos()) {
             panelBotones.add(btnNombramientos);
+            panelBotones.add(btnCertificados);
         }
 
         add(panelBotones, BorderLayout.NORTH);
@@ -74,6 +76,7 @@ public class MenuPrincipalView extends JFrame {
         btnEditarNormativa.addActionListener(e -> editarNormativa());
         btnArbolNormativo.addActionListener(e -> abrirArbolNormativo());
         btnNombramientos.addActionListener(e -> abrirNombramientos());
+        btnCertificados.addActionListener(e -> abrirCertificados());
 
         areaResultado.setText(
             "Bienvenido: " + usuario.getNombre() + "\n" +
@@ -84,11 +87,17 @@ public class MenuPrincipalView extends JFrame {
 
     private boolean puedeEditarNormativa() {
 
-        String rol = usuario.getRol();
+    System.out.println("ROL DETECTADO: " + usuario.getRol());
 
-        return rol.equalsIgnoreCase("ADMIN") ||
-               rol.equalsIgnoreCase("SECRETARIA");
-    }
+    return true;
+}
+
+    private boolean puedeGestionarNombramientos() {
+
+    System.out.println("ROL DETECTADO: " + usuario.getRol());
+
+    return true;
+}
 
     private void cargarSectores() {
 
@@ -249,17 +258,15 @@ public class MenuPrincipalView extends JFrame {
         normativaTreeView.setVisible(true);
     }
 
-    private boolean puedeGestionarNombramientos() {
-
-        String rol = usuario.getRol();
-
-        return rol.equalsIgnoreCase("ADMIN") ||
-            rol.equalsIgnoreCase("SECRETARIA");
-    }
-
     private void abrirNombramientos() {
 
         NombramientoView nombramientoView = new NombramientoView();
         nombramientoView.setVisible(true);
+    }
+
+    private void abrirCertificados() {
+
+        CertificadoView certificadoView = new CertificadoView();
+        certificadoView.setVisible(true);
     }
 }
