@@ -24,7 +24,7 @@ public class MenuPrincipalView extends JFrame {
         usuario = AuthController.getUsuarioAutenticado();
 
         setTitle("Proyecto AIR - Menú Principal | Rol: " + usuario.getRol());
-        setSize(950, 580);
+        setSize(1200, 650);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLocationRelativeTo(null);
 
@@ -35,6 +35,8 @@ public class MenuPrincipalView extends JFrame {
         JButton btnArbolNormativo = new JButton("Ver Árbol Normativo");
         JButton btnNombramientos = new JButton("Gestionar Nombramientos");
         JButton btnCertificados = new JButton("Generar Atestado");
+        JButton btnVotaciones = new JButton("Registrar Votación");
+        JButton btnAsistencia = new JButton("Registrar Asistencia");
 
         txtBusquedaAsambleista = new JTextField(18);
         comboSectores = new JComboBox<>();
@@ -44,7 +46,7 @@ public class MenuPrincipalView extends JFrame {
         areaResultado = new JTextArea();
         areaResultado.setEditable(false);
 
-        JPanel panelBotones = new JPanel();
+        JPanel panelBotones = new JPanel(new FlowLayout(FlowLayout.LEFT));
 
         panelBotones.add(btnAsambleistas);
         panelBotones.add(new JLabel("Buscar:"));
@@ -62,10 +64,12 @@ public class MenuPrincipalView extends JFrame {
             panelBotones.add(btnEditarNormativa);
         }
 
-        if (puedeGestionarNombramientos()) {
+       if (puedeGestionarNombramientos()) {
             panelBotones.add(btnNombramientos);
-            panelBotones.add(btnCertificados);
-        }
+             panelBotones.add(btnCertificados);
+            panelBotones.add(btnVotaciones);
+            panelBotones.add(btnAsistencia);
+}
 
         add(panelBotones, BorderLayout.NORTH);
         add(new JScrollPane(areaResultado), BorderLayout.CENTER);
@@ -77,6 +81,8 @@ public class MenuPrincipalView extends JFrame {
         btnArbolNormativo.addActionListener(e -> abrirArbolNormativo());
         btnNombramientos.addActionListener(e -> abrirNombramientos());
         btnCertificados.addActionListener(e -> abrirCertificados());
+        btnVotaciones.addActionListener(e -> abrirVotaciones());
+        btnAsistencia.addActionListener(e -> abrirAsistencia());
 
         areaResultado.setText(
             "Bienvenido: " + usuario.getNombre() + "\n" +
@@ -100,6 +106,14 @@ public class MenuPrincipalView extends JFrame {
     return rol.equalsIgnoreCase("ADMIN") ||
            rol.equalsIgnoreCase("SECRETARIA");
 }
+
+    private boolean puedeGestionarNombramientos() {
+
+        String rol = usuario.getRol();
+
+        return rol.equalsIgnoreCase("ADMIN") ||
+               rol.equalsIgnoreCase("SECRETARIA");
+    }
 
     private void cargarSectores() {
 
@@ -262,13 +276,15 @@ public class MenuPrincipalView extends JFrame {
 
     private void abrirNombramientos() {
 
-        NombramientoView nombramientoView = new NombramientoView();
-        nombramientoView.setVisible(true);
+        VotacionView votacionView = new VotacionView();
+        votacionView.setVisible(true);
     }
 
-    private void abrirCertificados() {
+    private void abrirAsistencia() {
 
-        CertificadoView certificadoView = new CertificadoView();
-        certificadoView.setVisible(true);
-    }
+    AsistenciaSesionView asistenciaView =
+        new AsistenciaSesionView();
+
+    asistenciaView.setVisible(true);
+}
 }
