@@ -3,6 +3,7 @@ package models;
 public class Votacion {
 
     private int idSesion;
+    private int idPropuesta;
 
     private int votosFavor;
     private int votosContra;
@@ -12,13 +13,14 @@ public class Votacion {
 
     public Votacion(
         int idSesion,
+        int idPropuesta,
         int votosFavor,
         int votosContra,
         int abstenciones,
         String resultado
     ) {
-
         this.idSesion = idSesion;
+        this.idPropuesta = idPropuesta;
         this.votosFavor = votosFavor;
         this.votosContra = votosContra;
         this.abstenciones = abstenciones;
@@ -27,6 +29,10 @@ public class Votacion {
 
     public int getIdSesion() {
         return idSesion;
+    }
+
+    public int getIdPropuesta() {
+        return idPropuesta;
     }
 
     public int getVotosFavor() {
@@ -43,16 +49,5 @@ public class Votacion {
 
     public String getResultado() {
         return resultado;
-    }
-
-    @Override
-    public String toString() {
-
-        return
-            "Sesión: " + idSesion +
-            " | Favor: " + votosFavor +
-            " | Contra: " + votosContra +
-            " | Abstenciones: " + abstenciones +
-            " | Resultado: " + resultado;
     }
 }

@@ -36,6 +36,7 @@ public class MenuPrincipalView extends JFrame {
         JButton btnNombramientos = new JButton("Gestionar Nombramientos");
         JButton btnCertificados = new JButton("Generar Atestado");
         JButton btnVotaciones = new JButton("Registrar Votación");
+        JButton btnAsistencia = new JButton("Registrar Asistencia");
 
         txtBusquedaAsambleista = new JTextField(18);
         comboSectores = new JComboBox<>();
@@ -63,11 +64,12 @@ public class MenuPrincipalView extends JFrame {
             panelBotones.add(btnEditarNormativa);
         }
 
-        if (puedeGestionarNombramientos()) {
+       if (puedeGestionarNombramientos()) {
             panelBotones.add(btnNombramientos);
-            panelBotones.add(btnCertificados);
+             panelBotones.add(btnCertificados);
             panelBotones.add(btnVotaciones);
-        }
+            panelBotones.add(btnAsistencia);
+}
 
         add(panelBotones, BorderLayout.NORTH);
         add(new JScrollPane(areaResultado), BorderLayout.CENTER);
@@ -80,6 +82,7 @@ public class MenuPrincipalView extends JFrame {
         btnNombramientos.addActionListener(e -> abrirNombramientos());
         btnCertificados.addActionListener(e -> abrirCertificados());
         btnVotaciones.addActionListener(e -> abrirVotaciones());
+        btnAsistencia.addActionListener(e -> abrirAsistencia());
 
         areaResultado.setText(
             "Bienvenido: " + usuario.getNombre() + "\n" +
@@ -280,4 +283,12 @@ public class MenuPrincipalView extends JFrame {
         VotacionView votacionView = new VotacionView();
         votacionView.setVisible(true);
     }
+
+    private void abrirAsistencia() {
+
+    AsistenciaSesionView asistenciaView =
+        new AsistenciaSesionView();
+
+    asistenciaView.setVisible(true);
+}
 }

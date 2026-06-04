@@ -8,7 +8,7 @@ import java.awt.*;
 public class VotacionView extends JFrame {
 
     private JTextField txtIdSesion;
-    private JTextField txtPresentes;
+    private JTextField txtIdPropuesta;
     private JTextField txtMinimoQuorum;
     private JTextField txtFavor;
     private JTextField txtContra;
@@ -18,12 +18,12 @@ public class VotacionView extends JFrame {
     public VotacionView() {
 
         setTitle("Registro de Votaciones");
-        setSize(600, 450);
+        setSize(600, 460);
         setLocationRelativeTo(null);
         setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 
         txtIdSesion = new JTextField(10);
-        txtPresentes = new JTextField(10);
+        txtIdPropuesta = new JTextField(10);
         txtMinimoQuorum = new JTextField(10);
         txtFavor = new JTextField(10);
         txtContra = new JTextField(10);
@@ -36,8 +36,8 @@ public class VotacionView extends JFrame {
         panelFormulario.add(new JLabel("ID Sesión:"));
         panelFormulario.add(txtIdSesion);
 
-        panelFormulario.add(new JLabel("Presentes:"));
-        panelFormulario.add(txtPresentes);
+        panelFormulario.add(new JLabel("ID Propuesta:"));
+        panelFormulario.add(txtIdPropuesta);
 
         panelFormulario.add(new JLabel("Quórum mínimo:"));
         panelFormulario.add(txtMinimoQuorum);
@@ -68,7 +68,7 @@ public class VotacionView extends JFrame {
         try {
 
             int idSesion = Integer.parseInt(txtIdSesion.getText());
-            int presentes = Integer.parseInt(txtPresentes.getText());
+            int idPropuesta = Integer.parseInt(txtIdPropuesta.getText());
             int minimoQuorum = Integer.parseInt(txtMinimoQuorum.getText());
             int favor = Integer.parseInt(txtFavor.getText());
             int contra = Integer.parseInt(txtContra.getText());
@@ -78,7 +78,7 @@ public class VotacionView extends JFrame {
 
             String resultado = controller.registrarVotacion(
                 idSesion,
-                presentes,
+                idPropuesta,
                 minimoQuorum,
                 favor,
                 contra,
@@ -88,12 +88,13 @@ public class VotacionView extends JFrame {
             areaResultado.setText(
                 "RESULTADO DE VOTACIÓN\n\n" +
                 "Sesión: " + idSesion + "\n" +
-                "Presentes: " + presentes + "\n" +
+                "Propuesta: " + idPropuesta + "\n" +
                 "Quórum mínimo: " + minimoQuorum + "\n" +
                 "A favor: " + favor + "\n" +
                 "En contra: " + contra + "\n" +
                 "Abstenciones: " + abstenciones + "\n\n" +
-                "Resultado: " + resultado
+                "Resultado: " + resultado + "\n\n" +
+                "El estado de la propuesta/acuerdo fue actualizado automáticamente."
             );
 
             JOptionPane.showMessageDialog(

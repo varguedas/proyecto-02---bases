@@ -13,33 +13,45 @@ public class VotacionController {
 
     public String registrarVotacion(
         int idSesion,
-        int presentes,
+        int idPropuesta,
         int minimoQuorum,
         int votosFavor,
         int votosContra,
         int abstenciones
     ) {
 
-        String resultado = votacionDAO.calcularResultado(
-            presentes,
-            minimoQuorum,
-            votosFavor,
-            votosContra
-        );
+        int presentes =
+            votacionDAO.contarPresentes(idSesion);
 
-        Votacion votacion = new Votacion(
-            idSesion,
-            votosFavor,
-            votosContra,
-            abstenciones,
-            resultado
-        );
+        String resultado =
+            votacionDAO.calcularResultado(
+                presentes,
+                minimoQuorum,
+                votosFavor,
+                votosContra
+            );
+
+        Votacion votacion =
+            new Votacion(
+                idSesion,
+                idPropuesta,
+                votosFavor,
+                votosContra,
+                abstenciones,
+                resultado
+            );
 
         boolean registrada =
             votacionDAO.registrarVotacion(votacion);
 
         if (registrada) {
-            return resultado;
+
+            votacionDAO.actualizarEstadoPropuesta(
+                idPropuesta,
+                resultado
+            );
+
+            return resultado + " | Presentes reales: " + presentes;
         }
 
         return "ERROR_REGISTRO";
