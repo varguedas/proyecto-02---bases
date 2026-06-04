@@ -93,11 +93,19 @@ public class MenuPrincipalView extends JFrame {
 
     private boolean puedeEditarNormativa() {
 
-        String rol = usuario.getRol();
+    String rol = usuario.getRol();
 
-        return rol.equalsIgnoreCase("ADMIN") ||
-               rol.equalsIgnoreCase("SECRETARIA");
-    }
+    return rol.equalsIgnoreCase("ADMIN") ||
+           rol.equalsIgnoreCase("SECRETARIA");
+}
+
+    private boolean puedeGestionarNombramientos() {
+
+    String rol = usuario.getRol();
+
+    return rol.equalsIgnoreCase("ADMIN") ||
+           rol.equalsIgnoreCase("SECRETARIA");
+}
 
     private boolean puedeGestionarNombramientos() {
 
@@ -267,18 +275,6 @@ public class MenuPrincipalView extends JFrame {
     }
 
     private void abrirNombramientos() {
-
-        NombramientoView nombramientoView = new NombramientoView();
-        nombramientoView.setVisible(true);
-    }
-
-    private void abrirCertificados() {
-
-        CertificadoView certificadoView = new CertificadoView();
-        certificadoView.setVisible(true);
-    }
-
-    private void abrirVotaciones() {
 
         VotacionView votacionView = new VotacionView();
         votacionView.setVisible(true);
