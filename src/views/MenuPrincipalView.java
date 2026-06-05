@@ -37,6 +37,7 @@ public class MenuPrincipalView extends JFrame {
         JButton btnCertificados = new JButton("Generar Atestado");
         JButton btnVotaciones = new JButton("Registrar Votación");
         JButton btnAsistencia = new JButton("Registrar Asistencia");
+        JButton btnBitacora = new JButton("Ver Bitácora");
 
         txtBusquedaAsambleista = new JTextField(18);
         comboSectores = new JComboBox<>();
@@ -66,10 +67,14 @@ public class MenuPrincipalView extends JFrame {
 
        if (puedeGestionarNombramientos()) {
             panelBotones.add(btnNombramientos);
-             panelBotones.add(btnCertificados);
+            panelBotones.add(btnCertificados);
             panelBotones.add(btnVotaciones);
             panelBotones.add(btnAsistencia);
-}
+       }
+
+        if (puedeVerBitacora()) {
+            panelBotones.add(btnBitacora);
+        }
 
         add(panelBotones, BorderLayout.NORTH);
         add(new JScrollPane(areaResultado), BorderLayout.CENTER);
@@ -80,9 +85,9 @@ public class MenuPrincipalView extends JFrame {
         btnEditarNormativa.addActionListener(e -> editarNormativa());
         btnArbolNormativo.addActionListener(e -> abrirArbolNormativo());
         btnNombramientos.addActionListener(e -> abrirNombramientos());
-        btnCertificados.addActionListener(e -> abrirCertificados());
-        btnVotaciones.addActionListener(e -> abrirVotaciones());
         btnAsistencia.addActionListener(e -> abrirAsistencia());
+        btnBitacora.addActionListener(e -> abrirBitacora());
+        btnVotaciones.addActionListener(e -> abrirVotaciones());
 
         areaResultado.setText(
             "Bienvenido: " + usuario.getNombre() + "\n" +
@@ -96,8 +101,8 @@ public class MenuPrincipalView extends JFrame {
     String rol = usuario.getRol();
 
     return rol.equalsIgnoreCase("ADMIN") ||
-           rol.equalsIgnoreCase("SECRETARIA");
-}
+           rol.equalsIgnoreCase("SECRETARIA");    
+    }
 
     private boolean puedeGestionarNombramientos() {
 
@@ -105,14 +110,15 @@ public class MenuPrincipalView extends JFrame {
 
     return rol.equalsIgnoreCase("ADMIN") ||
            rol.equalsIgnoreCase("SECRETARIA");
-}
+    }
 
-    private boolean puedeGestionarNombramientos() {
+
+    private boolean puedeVerBitacora() {
 
         String rol = usuario.getRol();
 
         return rol.equalsIgnoreCase("ADMIN") ||
-               rol.equalsIgnoreCase("SECRETARIA");
+                rol.equalsIgnoreCase("SECRETARIA");
     }
 
     private void cargarSectores() {
@@ -274,7 +280,9 @@ public class MenuPrincipalView extends JFrame {
         normativaTreeView.setVisible(true);
     }
 
-    private void abrirNombramientos() {
+
+
+    private void abrirVotaciones() {
 
         VotacionView votacionView = new VotacionView();
         votacionView.setVisible(true);
@@ -286,5 +294,21 @@ public class MenuPrincipalView extends JFrame {
         new AsistenciaSesionView();
 
     asistenciaView.setVisible(true);
-}
+    }
+
+    private void abrirBitacora() {
+
+        BitacoraAuditoriaView bitacoraView =
+                new BitacoraAuditoriaView();
+
+        bitacoraView.setVisible(true);
+    }
+
+    private void abrirNombramientos() {
+
+        NombramientoView nombramientoView =
+                new NombramientoView();
+
+        nombramientoView.setVisible(true);
+    }
 }
