@@ -760,3 +760,29 @@ CREATE TABLE IF NOT EXISTS certificacion_sprint3 (
     hash_seguridad TEXT,
     fecha_emision TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
+
+-- Usuario base para registros de auditoría del sistema
+INSERT INTO air.sys_usuario (
+    id_usuario,
+    username,
+    passw,
+    email,
+    estado
+)
+VALUES (
+    1,
+    'auditoria_sistema',
+    'N/A',
+    'auditoria@air.local',
+    TRUE
+)
+ON CONFLICT (id_usuario) DO NOTHING;
+
+SELECT setval(
+    pg_get_serial_sequence('air.sys_usuario', 'id_usuario'),
+    GREATEST(
+        (SELECT COALESCE(MAX(id_usuario), 1) FROM air.sys_usuario),
+        1
+    ),
+    true
+);

@@ -34,7 +34,22 @@ public class AsistenciaSesionDAO {
                 asistencia.getEstadoAsistencia()
             );
 
-            return statement.executeUpdate() > 0;
+            int filasInsertadas = statement.executeUpdate();
+
+            if (filasInsertadas > 0) {
+                registrarLogAuditoria(
+                    connection,
+                    "INSERT",
+                    "asistencia_sesion",
+                    "Registro de asistencia para sesión " +
+                    asistencia.getIdSesion() +
+                    " y asambleísta " +
+                    asistencia.getIdAsambleista(),
+                    asistencia.getIdSesion()
+                );
+            }
+
+            return filasInsertadas > 0;
 
         } catch (Exception e) {
 
@@ -47,4 +62,37 @@ public class AsistenciaSesionDAO {
             return false;
         }
     }
+    
+    private void registrarLogAuditoria(
+        Connection connection,
+        String accion,
+        String tablaAfectada,
+        String detalle,
+        int registroId
+    ) throws Exception {
+
+        String sql = """
+            INSERT INTO air.sys_log_auditoria (
+                id_usuario,
+                accion,
+                tabla_afectada,
+                detalle,
+                registro_id
+            )
+            VALUES (?, ?, ?, ?, ?)
+        """;
+
+        try (PreparedStatement statement = connection.prepareStatement(sql)) {
+
+            statement.setInt(1, 1);
+            statement.setString(2, accion);
+            statement.setString(3, tablaAfectada);
+            statement.setString(4, detalle);
+            statement.setInt(5, registroId);
+
+            statement.executeUpdate();
+        }
+    }
+
+
 }
