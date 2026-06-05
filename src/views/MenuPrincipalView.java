@@ -28,6 +28,7 @@ public class MenuPrincipalView extends JFrame {
         setMinimumSize(new Dimension(1150, 600));
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLocationRelativeTo(null);
+        setExtendedState(JFrame.MAXIMIZED_BOTH);
 
         JButton btnAsambleistas = new JButton("Listar Asambleístas");
         JButton btnBuscarAsambleistas = new JButton("Buscar Asambleístas");
