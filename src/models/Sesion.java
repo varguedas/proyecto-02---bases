@@ -1,41 +1,69 @@
 package models;
 
-
 import java.time.LocalDate;
 
 public class Sesion {
 
     private int idSesion;
-    private String titulo;
+    private int idTipoModalidad;
+    private int idTipoSesion;
+    private String numeroSesion;
     private LocalDate fecha;
-    private String descripcion;
-    private String estado;
+    private String linkActa;
+    private int quorumRequerido;
 
-    public Sesion(int idSesion, String titulo, LocalDate fecha, String descripcion, String estado) {
+    public Sesion(
+        int idSesion,
+        int idTipoModalidad,
+        int idTipoSesion,
+        String numeroSesion,
+        LocalDate fecha,
+        String linkActa,
+        int quorumRequerido
+    ) {
         this.idSesion = idSesion;
-        this.titulo = titulo;
+        this.idTipoModalidad = idTipoModalidad;
+        this.idTipoSesion = idTipoSesion;
+        this.numeroSesion = numeroSesion;
         this.fecha = fecha;
-        this.descripcion = descripcion;
-        this.estado = estado;
+        this.linkActa = linkActa;
+        this.quorumRequerido = quorumRequerido;
     }
 
     public int getIdSesion() {
         return idSesion;
     }
 
-    public String getTitulo() {
-        return titulo;
+    public int getIdTipoModalidad() {
+        return idTipoModalidad;
+    }
+
+    public int getIdTipoSesion() {
+        return idTipoSesion;
+    }
+
+    public String getNumeroSesion() {
+        return numeroSesion;
     }
 
     public LocalDate getFecha() {
         return fecha;
     }
 
-    public String getDescripcion() {
-        return descripcion;
+    public String getLinkActa() {
+        return linkActa;
     }
 
-    public String getEstado() {
-        return estado;
+    public int getQuorumRequerido() {
+        return quorumRequerido;
+    }
+
+    @Override
+    public String toString() {
+        return idSesion + " | " +
+               numeroSesion + " | " +
+               fecha + " | Quórum: " +
+               quorumRequerido + " | Acta: " +
+               linkActa;
     }
 }

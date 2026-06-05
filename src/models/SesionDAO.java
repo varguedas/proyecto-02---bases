@@ -4,24 +4,52 @@ import config.DatabaseConnection;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.sql.Date;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
 public class SesionDAO {
 
     public boolean crearSesion(Sesion sesion) {
-        String sql = "INSERT INTO sesiones (titulo, fecha, descripcion, estado) VALUES (?, ?, ?, ?)";
 
-        try (Connection connection = DatabaseConnection.connect();
-             PreparedStatement statement = connection.prepareStatement(sql)) {
+        String sql = """
+            INSERT INTO air.sesiones (
+                id_tipo_modalidad,
+                id_tipo_sesion,
+                numero_sesion,
+                fecha,
+                link_acta,
+                quorum_requerido
+            )
+            VALUES (?, ?, ?, ?, ?, ?)
+        """;
 
-            statement.setString(1, sesion.getTitulo());
-            statement.setDate(2, java.sql.Date.valueOf(sesion.getFecha()));
-            statement.setString(3, sesion.getDescripcion());
-            statement.setString(4, sesion.getEstado());
+        try (
+            Connection connection = DatabaseConnection.connect();
+            PreparedStatement statement = connection.prepareStatement(sql)
+        ) {
 
-            int filasInsertadas = statement.executeUpdate();
-            return filasInsertadas > 0;
+            statement.setInt(1, sesion.getIdTipoModalidad());
+            statement.setInt(2, sesion.getIdTipoSesion());
+            statement.setString(3, sesion.getNumeroSesion());
+            statement.setDate(4, Date.valueOf(sesion.getFecha()));
+            statement.setString(5, sesion.getLinkActa());
+            statement.setInt(6, sesion.getQuorumRequerido());
+
+            int filas = statement.executeUpdate();
+
+            if (filas > 0) {
+                registrarLogAuditoria(
+                    connection,
+                    "INSERT",
+                    "sesiones",
+                    "Sesión registrada: " + sesion.getNumeroSesion(),
+                    0
+                );
+            }
+
+            return filas > 0;
 
         } catch (Exception e) {
             System.out.println("Error al crear sesión:");
@@ -31,21 +59,38 @@ public class SesionDAO {
     }
 
     public List<Sesion> listarSesiones() {
+
         List<Sesion> sesiones = new ArrayList<>();
 
-        String sql = "SELECT id_sesion, titulo, fecha, descripcion, estado FROM sesiones ORDER BY fecha DESC";
+        String sql = """
+            SELECT
+                id_sesion,
+                id_tipo_modalidad,
+                id_tipo_sesion,
+                numero_sesion,
+                fecha,
+                link_acta,
+                quorum_requerido
+            FROM air.sesiones
+            ORDER BY fecha DESC, id_sesion DESC
+        """;
 
-        try (Connection connection = DatabaseConnection.connect();
-             PreparedStatement statement = connection.prepareStatement(sql);
-             ResultSet resultSet = statement.executeQuery()) {
+        try (
+            Connection connection = DatabaseConnection.connect();
+            PreparedStatement statement = connection.prepareStatement(sql);
+            ResultSet resultSet = statement.executeQuery()
+        ) {
 
             while (resultSet.next()) {
+
                 Sesion sesion = new Sesion(
                     resultSet.getInt("id_sesion"),
-                    resultSet.getString("titulo"),
+                    resultSet.getInt("id_tipo_modalidad"),
+                    resultSet.getInt("id_tipo_sesion"),
+                    resultSet.getString("numero_sesion"),
                     resultSet.getDate("fecha").toLocalDate(),
-                    resultSet.getString("descripcion"),
-                    resultSet.getString("estado")
+                    resultSet.getString("link_acta"),
+                    resultSet.getInt("quorum_requerido")
                 );
 
                 sesiones.add(sesion);
@@ -59,31 +104,34 @@ public class SesionDAO {
         return sesiones;
     }
 
-    public Sesion buscarSesionPorId(int idSesion) {
-        String sql = "SELECT id_sesion, titulo, fecha, descripcion, estado FROM sesiones WHERE id_sesion = ?";
+    private void registrarLogAuditoria(
+        Connection connection,
+        String accion,
+        String tablaAfectada,
+        String detalle,
+        int registroId
+    ) throws Exception {
 
-        try (Connection connection = DatabaseConnection.connect();
-             PreparedStatement statement = connection.prepareStatement(sql)) {
+        String sql = """
+            INSERT INTO air.sys_log_auditoria (
+                id_usuario,
+                accion,
+                tabla_afectada,
+                detalle,
+                registro_id
+            )
+            VALUES (?, ?, ?, ?, ?)
+        """;
 
-            statement.setInt(1, idSesion);
+        try (PreparedStatement statement = connection.prepareStatement(sql)) {
 
-            try (ResultSet resultSet = statement.executeQuery()) {
-                if (resultSet.next()) {
-                    return new Sesion(
-                        resultSet.getInt("id_sesion"),
-                        resultSet.getString("titulo"),
-                        resultSet.getDate("fecha").toLocalDate(),
-                        resultSet.getString("descripcion"),
-                        resultSet.getString("estado")
-                    );
-                }
-            }
+            statement.setInt(1, 1);
+            statement.setString(2, accion);
+            statement.setString(3, tablaAfectada);
+            statement.setString(4, detalle);
+            statement.setInt(5, registroId);
 
-        } catch (Exception e) {
-            System.out.println("Error al buscar sesión:");
-            e.printStackTrace();
+            statement.executeUpdate();
         }
-
-        return null;
     }
 }

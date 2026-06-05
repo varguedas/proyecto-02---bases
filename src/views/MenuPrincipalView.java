@@ -39,6 +39,7 @@ public class MenuPrincipalView extends JFrame {
         JButton btnVotaciones = new JButton("Registrar Votación");
         JButton btnAsistencia = new JButton("Registrar Asistencia");
         JButton btnBitacora = new JButton("Ver Bitácora");
+        JButton btnSesiones = new JButton("Gestionar Sesiones");
 
         txtBusquedaAsambleista = new JTextField(18);
         comboSectores = new JComboBox<>();
@@ -69,20 +70,16 @@ public class MenuPrincipalView extends JFrame {
         }
 
        if (puedeGestionarNombramientos()) {
-        panelAdministracion.add(btnNombramientos);
-        panelAdministracion.add(btnCertificados);
-        panelAdministracion.add(btnVotaciones);
-        panelAdministracion.add(btnAsistencia);
-    }
+            panelAdministracion.add(btnSesiones);
+            panelAdministracion.add(btnNombramientos);
+            panelAdministracion.add(btnCertificados);
+            panelAdministracion.add(btnVotaciones);
+            panelAdministracion.add(btnAsistencia);
+        }
 
-    if (puedeVerBitacora()) {
-        panelAdministracion.add(btnBitacora);
-    }
-
-    panelSuperior.add(panelBusqueda);
-    panelSuperior.add(panelAdministracion);
-
-    add(panelSuperior, BorderLayout.NORTH);
+        if (puedeVerBitacora()) {
+            panelAdministracion.add(btnBitacora);
+        }
 
         panelSuperior.add(panelBusqueda);
         panelSuperior.add(panelAdministracion);
@@ -102,6 +99,7 @@ public class MenuPrincipalView extends JFrame {
         btnBitacora.addActionListener(e -> abrirBitacora());
         btnVotaciones.addActionListener(e -> abrirVotaciones());
         btnCertificados.addActionListener(e -> abrirCertificados());
+        btnSesiones.addActionListener(e -> abrirSesiones());
 
         areaResultado.setText(
             "Bienvenido: " + usuario.getNombre() + "\n" +
@@ -330,4 +328,10 @@ public class MenuPrincipalView extends JFrame {
         CertificadoView certificadoView = new CertificadoView();
         certificadoView.setVisible(true);
     }
+
+    private void abrirSesiones() {
+        SesionView sesionView = new SesionView();
+        sesionView.setVisible(true);
+    }
+
 }
