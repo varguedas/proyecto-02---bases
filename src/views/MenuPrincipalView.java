@@ -107,13 +107,7 @@ public class MenuPrincipalView extends JFrame {
            rol.equalsIgnoreCase("SECRETARIA");
 }
 
-    private boolean puedeGestionarNombramientos() {
-
-        String rol = usuario.getRol();
-
-        return rol.equalsIgnoreCase("ADMIN") ||
-               rol.equalsIgnoreCase("SECRETARIA");
-    }
+    
 
     private void cargarSectores() {
 
@@ -287,4 +281,17 @@ public class MenuPrincipalView extends JFrame {
 
     asistenciaView.setVisible(true);
 }
+
+    private void abrirCertificados() {
+
+        CertificadoView certificadoView = new CertificadoView();
+        certificadoView.setVisible(true);
+}
+
+    private void abrirVotaciones() {
+
+        VotacionView votacionView = new VotacionView();
+        votacionView.setVisible(true);
+}
+
 }
