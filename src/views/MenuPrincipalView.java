@@ -101,6 +101,7 @@ public class MenuPrincipalView extends JFrame {
         btnAsistencia.addActionListener(e -> abrirAsistencia());
         btnBitacora.addActionListener(e -> abrirBitacora());
         btnVotaciones.addActionListener(e -> abrirVotaciones());
+        btnCertificados.addActionListener(e -> abrirCertificados());
 
         areaResultado.setText(
             "Bienvenido: " + usuario.getNombre() + "\n" +
@@ -323,5 +324,10 @@ public class MenuPrincipalView extends JFrame {
                 new NombramientoView();
 
         nombramientoView.setVisible(true);
+    }
+    private void abrirCertificados() {
+
+        CertificadoView certificadoView = new CertificadoView();
+        certificadoView.setVisible(true);
     }
 }
