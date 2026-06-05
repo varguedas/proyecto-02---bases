@@ -137,3 +137,54 @@ Actualmente el sistema posee:
 - gestión de asambleístas,
 - autenticación básica,
 - integración GitFlow.
+
+## Módulos incorporados en Sprint 3
+
+### Gestión de sesiones
+
+El módulo de sesiones permite registrar y listar sesiones legislativas usando la tabla `air.sesiones`. Cada sesión almacena número de sesión, fecha, modalidad, tipo de sesión, enlace o referencia del acta y quórum requerido.
+
+Archivos principales:
+
+- `Sesion.java`
+- `SesionDAO.java`
+- `SesionView.java`
+
+### Registro de asistencia
+
+El módulo de asistencia permite asociar asambleístas a una sesión y registrar su estado de participación. Esta información se utiliza posteriormente para validar el quórum en las votaciones.
+
+Archivos principales:
+
+- `AsistenciaSesionDAO.java`
+- `AsistenciaSesionView.java`
+
+### Registro de votaciones
+
+El módulo de votaciones registra votos a favor, en contra y abstenciones. Además, valida el quórum mínimo requerido para determinar si una votación puede ser aprobada o si queda sin quórum.
+
+Archivos principales:
+
+- `Votacion.java`
+- `VotacionDAO.java`
+- `VotacionView.java`
+
+### Generación de atestados
+
+El módulo de atestados permite generar una certificación institucional para un asambleísta. La certificación incluye folio único, datos del asambleísta, fecha de emisión y hash SHA-256 para verificación.
+
+Archivos principales:
+
+- `Certificado.java`
+- `CertificadoDAO.java`
+- `CertificadoController.java`
+- `CertificadoView.java`
+
+### Bitácora de auditoría
+
+La bitácora registra acciones críticas realizadas en el sistema, incluyendo creación de sesiones, registro de asistencia, votaciones y generación de certificaciones. Esta información se consulta desde la vista de bitácora.
+
+Archivos principales:
+
+- `BitacoraAuditoriaView.java`
+- `air.sys_log_auditoria`
