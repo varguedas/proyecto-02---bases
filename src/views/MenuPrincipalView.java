@@ -24,7 +24,8 @@ public class MenuPrincipalView extends JFrame {
         usuario = AuthController.getUsuarioAutenticado();
 
         setTitle("Proyecto AIR - Menú Principal | Rol: " + usuario.getRol());
-        setSize(1200, 650);
+        setSize(1300, 650);
+        setMinimumSize(new Dimension(1150, 600));
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLocationRelativeTo(null);
 
@@ -47,36 +48,48 @@ public class MenuPrincipalView extends JFrame {
         areaResultado = new JTextArea();
         areaResultado.setEditable(false);
 
-        JPanel panelBotones = new JPanel(new FlowLayout(FlowLayout.LEFT));
+        JPanel panelBusqueda = new JPanel(new FlowLayout(FlowLayout.LEFT));
+        JPanel panelAdministracion = new JPanel(new FlowLayout(FlowLayout.LEFT));
+        JPanel panelSuperior = new JPanel(new GridLayout(2, 1));
 
-        panelBotones.add(btnAsambleistas);
-        panelBotones.add(new JLabel("Buscar:"));
-        panelBotones.add(txtBusquedaAsambleista);
-        panelBotones.add(new JLabel("Sector:"));
-        panelBotones.add(comboSectores);
-        panelBotones.add(btnBuscarAsambleistas);
+        panelBusqueda.add(btnAsambleistas);
+        panelBusqueda.add(new JLabel("Buscar:"));
+        panelBusqueda.add(txtBusquedaAsambleista);
+        panelBusqueda.add(new JLabel("Sector:"));
+        panelBusqueda.add(comboSectores);
+        panelBusqueda.add(btnBuscarAsambleistas);
 
         if (!usuario.getRol().equalsIgnoreCase("ASAMBLEISTA")) {
-            panelBotones.add(btnNormativas);
-            panelBotones.add(btnArbolNormativo);
+            panelAdministracion.add(btnNormativas);
+            panelAdministracion.add(btnArbolNormativo);
         }
 
         if (puedeEditarNormativa()) {
-            panelBotones.add(btnEditarNormativa);
+            panelAdministracion.add(btnEditarNormativa);
         }
 
        if (puedeGestionarNombramientos()) {
-            panelBotones.add(btnNombramientos);
-            panelBotones.add(btnCertificados);
-            panelBotones.add(btnVotaciones);
-            panelBotones.add(btnAsistencia);
-       }
+        panelAdministracion.add(btnNombramientos);
+        panelAdministracion.add(btnCertificados);
+        panelAdministracion.add(btnVotaciones);
+        panelAdministracion.add(btnAsistencia);
+    }
 
-        if (puedeVerBitacora()) {
-            panelBotones.add(btnBitacora);
-        }
+    if (puedeVerBitacora()) {
+        panelAdministracion.add(btnBitacora);
+    }
 
-        add(panelBotones, BorderLayout.NORTH);
+    panelSuperior.add(panelBusqueda);
+    panelSuperior.add(panelAdministracion);
+
+    add(panelSuperior, BorderLayout.NORTH);
+
+        panelSuperior.add(panelBusqueda);
+        panelSuperior.add(panelAdministracion);
+
+        add(panelSuperior, BorderLayout.NORTH);
+
+    
         add(new JScrollPane(areaResultado), BorderLayout.CENTER);
 
         btnAsambleistas.addActionListener(e -> listarAsambleistas());

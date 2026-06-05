@@ -18,7 +18,8 @@ public class VotacionView extends JFrame {
     public VotacionView() {
 
         setTitle("Registro de Votaciones");
-        setSize(600, 460);
+        setSize(900, 430);
+        setMinimumSize(new Dimension(850, 400));
         setLocationRelativeTo(null);
         setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 

@@ -15,7 +15,8 @@ public class AsistenciaSesionView extends JFrame {
     public AsistenciaSesionView() {
 
         setTitle("Registro de Asistencia");
-        setSize(550, 350);
+        setSize(800, 330);
+        setMinimumSize(new Dimension(750, 300));
         setLocationRelativeTo(null);
         setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 
