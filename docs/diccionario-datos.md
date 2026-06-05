@@ -160,3 +160,72 @@ Registra automáticamente operaciones relevantes del sistema mediante triggers d
 | hash_seguridad | TEXT | Hash SHA-256 |
 | fecha_emision | TIMESTAMP | Fecha de emisión |
 ##
+
+## Tablas principales del Sprint 3
+
+### air.sesiones
+
+Registra las sesiones legislativas del sistema.
+
+| Campo | Descripción |
+|---|---|
+| id_sesion | Identificador de la sesión |
+| id_tipo_modalidad | Modalidad de la sesión |
+| id_tipo_sesion | Tipo de sesión |
+| numero_sesion | Número o código de sesión |
+| fecha | Fecha de la sesión |
+| link_acta | Referencia o enlace del acta |
+| quorum_requerido | Cantidad mínima requerida para sesionar |
+
+### air.asistencia_sesion
+
+Registra la asistencia de asambleístas a una sesión.
+
+| Campo | Descripción |
+|---|---|
+| id_asistencia | Identificador del registro |
+| id_sesion | Sesión asociada |
+| asambleista_id | Asambleísta asociado |
+| estado_asistencia | Estado de asistencia |
+| fecha_registro | Fecha y hora del registro |
+
+### air.votacion
+
+Registra votaciones asociadas a sesiones y propuestas.
+
+| Campo | Descripción |
+|---|---|
+| id_votacion | Identificador de la votación |
+| id_sesion | Sesión asociada |
+| id_propuesta | Propuesta asociada |
+| quorum_minimo | Quórum requerido |
+| votos_favor | Votos a favor |
+| votos_contra | Votos en contra |
+| abstenciones | Abstenciones |
+| resultado | Resultado de la votación |
+
+### air.certificacion_emitida
+
+Registra certificaciones o atestados generados por el sistema.
+
+| Campo | Descripción |
+|---|---|
+| id_certificacion | Identificador de la certificación |
+| folio | Folio único generado |
+| contenido | Contenido de la certificación |
+| hash_seguridad | Hash SHA-256 de verificación |
+| fecha_emision | Fecha de emisión |
+
+### air.sys_log_auditoria
+
+Registra acciones críticas del sistema.
+
+| Campo | Descripción |
+|---|---|
+| id_log | Identificador del registro |
+| id_usuario | Usuario asociado a la acción |
+| accion | Tipo de acción realizada |
+| tabla_afectada | Tabla afectada |
+| detalle | Descripción de la acción |
+| registro_id | ID del registro afectado |
+| fecha_hora | Fecha y hora del evento |

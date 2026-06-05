@@ -37,3 +37,24 @@ El sistema será desarrollado bajo arquitectura MVC y utilizando una base de dat
 | Gestión del proyecto | GitHub Projects (Kanban) |
 
 ---
+
+## Funcionalidades implementadas en Sprint 3
+
+Durante el Sprint 3 se incorporaron los módulos principales para completar el flujo legislativo del sistema AIR:
+
+- Gestión de sesiones legislativas.
+- Registro de asistencia por sesión.
+- Registro de votaciones con validación de quórum.
+- Generación de atestados con folio único y hash SHA-256.
+- Bitácora de auditoría para acciones críticas.
+- Integración de accesos desde el menú principal.
+- Validación funcional con datos reales en PostgreSQL.
+
+El flujo principal demostrado es:
+
+1. Crear una sesión legislativa.
+2. Registrar asistencia de asambleístas.
+3. Registrar una votación asociada a una propuesta.
+4. Validar el resultado según quórum.
+5. Generar un atestado institucional.
+6. Consultar la bitácora de auditoría.
