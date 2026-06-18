@@ -785,4 +785,78 @@ SELECT setval(
         1
     ),
     true
+    
 );
+
+
+-- ============================================================
+-- Reglamento para el uso de la cocina en la oficina
+-- Datos para defensa del proyecto
+-- ============================================================
+
+DELETE FROM normativa_arbol
+WHERE id_elemento BETWEEN 100 AND 120;
+
+INSERT INTO normativa_arbol (
+    id_elemento,
+    id_padre,
+    tipo,
+    titulo,
+    estado_vigencia,
+    orden
+)
+VALUES
+-- Raíz
+(100, NULL, 'Reglamento',
+ 'Reglamento para el uso de la cocina en la oficina',
+ 'VIGENTE', 2),
+
+-- Título I
+(101, 100, 'Título',
+ 'Título I - De las Normas Generales de Convivencia e Higiene en la Cocina',
+ 'VIGENTE', 1),
+
+-- Capítulo I
+(102, 101, 'Capítulo',
+ 'Capítulo I - Del Uso Correcto de los Electrodomésticos Comunes',
+ 'VIGENTE', 1),
+
+-- Artículo 1
+(103, 102, 'Artículo',
+ 'Artículo 1 - El uso del horno de microondas está restringido exclusivamente a la calefacción de alimentos de consumo inmediato.',
+ 'VIGENTE', 1),
+
+-- Inciso a)
+(104, 103, 'Inciso',
+ 'Inciso a) - Queda estrictamente prohibido introducir recipientes de metal, papel aluminio o plástico no apto para microondas.',
+ 'VIGENTE', 1),
+
+-- Inciso b)
+(105, 103, 'Inciso',
+ 'Inciso b) - Todo usuario deberá limpiar de inmediato cualquier salpicadura o derrame ocurrido durante su uso.',
+ 'VIGENTE', 2),
+
+-- Artículo 2
+(106, 102, 'Artículo',
+ 'Artículo 2 - El refrigerador de la oficina es de uso compartido y temporal para el almacenamiento de alimentos del día en curso.',
+ 'VIGENTE', 2),
+
+-- Inciso a)
+(107, 106, 'Inciso',
+ 'Inciso a) - Todos los recipientes guardados deberán estar debidamente etiquetados con el nombre del colaborador y la fecha.',
+ 'VIGENTE', 1),
+
+-- Inciso b)
+(108, 106, 'Inciso',
+ 'Inciso b) - Los días viernes a las 17:00 horas se realizará una limpieza general, desechando todo producto no retirado.',
+ 'VIGENTE', 2),
+
+-- Capítulo II
+(109, 101, 'Capítulo',
+ 'Capítulo II - De la Gestión de Residuos y Limpieza de Utensilios',
+ 'VIGENTE', 2),
+
+-- Artículo 3
+(110, 109, 'Artículo',
+ 'Artículo 3 - Cada usuario será responsable de lavar, secar y guardar los utensilios utilizados inmediatamente después de su uso.',
+ 'VIGENTE', 1);
