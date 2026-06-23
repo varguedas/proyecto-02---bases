@@ -860,3 +860,55 @@ VALUES
 (110, 109, 'Artículo',
  'Artículo 3 - Cada usuario será responsable de lavar, secar y guardar los utensilios utilizados inmediatamente después de su uso.',
  'VIGENTE', 1);
+
+ DELETE FROM normativa_arbol
+WHERE id_elemento BETWEEN 300 AND 320;
+
+INSERT INTO normativa_arbol (
+    id_elemento,
+    id_padre,
+    tipo,
+    titulo,
+    estado_vigencia,
+    orden
+)
+VALUES
+(300, NULL, 'Reglamento',
+ 'Protocolo de Convivencia con Gatos que se Creen Reyes (Versión 4.2)',
+ 'VIGENTE', 3),
+
+(301, 300, 'Título',
+ 'Título I - De la Servidumbre Humana',
+ 'VIGENTE', 1),
+
+(302, 301, 'Artículo',
+ 'Artículo 1.1 - Servicio de Catering Inmediato: Todo humano deberá atender el llamado de maullido en un lapso no superior a los 3 segundos.',
+ 'VIGENTE', 1),
+
+(303, 302, 'Sección',
+ 'Sección A - Si el gato deja comida en el plato, el humano debe asumir la culpa.',
+ 'VIGENTE', 1),
+
+(304, 303, 'Inciso',
+ 'Inciso i - El humano debe ofrecer una disculpa verbal sincera antes de retirar el plato.',
+ 'VIGENTE', 1),
+
+(305, 303, 'Inciso',
+ 'Inciso ii - Se prohíbe mirar al gato con juicio mientras este ignora el alimento.',
+ 'VIGENTE', 2),
+
+(306, 301, 'Artículo',
+ 'Artículo 1.2 - Derecho a la Inmovilidad (Ley del No me Muevas): Si un gato decide dormir sobre el regazo, el humano pierde toda capacidad de movimiento.',
+ 'VIGENTE', 2),
+
+(307, 306, 'Sección',
+ 'Sección A - En caso de emergencia, se permite pedir permiso formal.',
+ 'VIGENTE', 1),
+
+(308, 307, 'Inciso',
+ 'Inciso i - La solicitud debe incluir un mínimo de 15 segundos de rascado detrás de las orejas.',
+ 'VIGENTE', 1),
+
+(309, 307, 'Inciso',
+ 'Inciso ii - Si el gato emite un gruñido, el humano debe resignarse a su destino y cancelar cualquier plan externo.',
+ 'VIGENTE', 2);
