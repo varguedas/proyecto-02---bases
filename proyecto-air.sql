@@ -912,3 +912,315 @@ VALUES
 (309, 307, 'Inciso',
  'Inciso ii - Si el gato emite un gruñido, el humano debe resignarse a su destino y cancelar cualquier plan externo.',
  'VIGENTE', 2);
+
+
+ -- ============================================================
+-- CIERRE MÓDULOS 4, 5 Y 6 - DEFENSA
+-- Validación cruzada, folio, no repudio, anulación y validación externa
+-- ============================================================
+
+
+-- ============================================================
+-- Usuario base para registros de auditoría
+-- ============================================================
+
+INSERT INTO air.sys_usuario (
+    id_usuario,
+    username,
+    passw,
+    email,
+    estado
+)
+VALUES (
+    1,
+    'auditoria_sistema',
+    'N/A',
+    'auditoria@air.local',
+    TRUE
+)
+ON CONFLICT (id_usuario) DO NOTHING;
+
+
+
+-- ============================================================
+-- 4.3 Vista SQL cruzada para validación del borrador
+-- ============================================================
+
+CREATE OR REPLACE VIEW air.vw_validacion_borrador_certificacion AS
+SELECT
+    a.asambleista_id,
+    a.cedula,
+    a.nombre,
+
+    COUNT(DISTINCT asi.id_asistencia)
+        FILTER (WHERE asi.estado_asistencia = 'PRESENTE')
+        AS asistencias_presentes,
+
+    COUNT(DISTINCT asi.id_sesion)
+        AS sesiones_con_asistencia,
+
+    COUNT(DISTINCT p.id_propuesta)
+        AS propuestas_asociadas,
+
+    COUNT(DISTINCT v.id_votacion)
+        AS votaciones_registradas,
+
+    COUNT(DISTINCT CASE WHEN v.resultado = 'APROBADO' THEN v.id_votacion END)
+        AS votaciones_aprobadas,
+
+    COUNT(DISTINCT CASE WHEN v.resultado = 'SIN_QUORUM' THEN v.id_votacion END)
+        AS votaciones_sin_quorum,
+
+    (
+        SELECT COUNT(*)
+        FROM air.nombramiento
+    ) AS nombramientos_registrados_sistema
+
+FROM air.asambleista a
+LEFT JOIN air.asistencia_sesion asi
+    ON asi.id_asambleista = a.asambleista_id
+LEFT JOIN air.propuesta_acuerdo p
+    ON p.id_sesion = asi.id_sesion
+LEFT JOIN air.votacion v
+    ON v.id_sesion = asi.id_sesion
+GROUP BY
+    a.asambleista_id,
+    a.cedula,
+    a.nombre;
+
+
+
+-- ============================================================
+-- 5.1, 6.2 Preparación de certificaciones
+-- Folio formal, estado, justificación y datos de anulación
+-- ============================================================
+
+DROP TRIGGER IF EXISTS tg_no_repudio_cert
+ON air.certificacion_emitida;
+
+ALTER TABLE air.certificacion_emitida
+ADD COLUMN IF NOT EXISTS folio VARCHAR(80);
+
+ALTER TABLE air.certificacion_emitida
+ADD COLUMN IF NOT EXISTS estado VARCHAR(20) NOT NULL DEFAULT 'EMITIDO';
+
+ALTER TABLE air.certificacion_emitida
+ADD COLUMN IF NOT EXISTS justificacion_anulacion TEXT;
+
+ALTER TABLE air.certificacion_emitida
+ADD COLUMN IF NOT EXISTS fecha_anulacion TIMESTAMP;
+
+ALTER TABLE air.certificacion_emitida
+ADD COLUMN IF NOT EXISTS anulado_por INTEGER;
+
+
+
+-- ============================================================
+-- Folios formales para registros ya existentes
+-- Formato: DAIR-001-2026
+-- ============================================================
+
+UPDATE air.certificacion_emitida
+SET folio =
+    'DAIR-' ||
+    LPAD(id_certificacion::TEXT, 3, '0') ||
+    '-' ||
+    EXTRACT(YEAR FROM COALESCE(fecha_emision, NOW()))::TEXT
+WHERE folio IS NULL OR TRIM(folio) = '';
+
+CREATE UNIQUE INDEX IF NOT EXISTS ux_certificacion_emitida_folio
+ON air.certificacion_emitida(folio);
+
+
+
+-- ============================================================
+-- 5.1 Consecutivo automático de folio
+-- ============================================================
+
+CREATE SEQUENCE IF NOT EXISTS air.seq_folio_certificacion;
+
+SELECT setval(
+    'air.seq_folio_certificacion',
+    GREATEST(
+        (
+            SELECT COALESCE(MAX(id_certificacion), 1)
+            FROM air.certificacion_emitida
+        ),
+        1
+    ),
+    true
+);
+
+CREATE OR REPLACE FUNCTION air.fn_asignar_folio_certificacion()
+RETURNS TRIGGER AS $$
+BEGIN
+    IF NEW.folio IS NULL OR TRIM(NEW.folio) = '' THEN
+        NEW.folio :=
+            'DAIR-' ||
+            LPAD(nextval('air.seq_folio_certificacion')::TEXT, 3, '0') ||
+            '-' ||
+            EXTRACT(YEAR FROM NOW())::TEXT;
+    END IF;
+
+    RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+DROP TRIGGER IF EXISTS tg_folio_secuencial
+ON air.certificacion_emitida;
+
+CREATE TRIGGER tg_folio_secuencial
+BEFORE INSERT
+ON air.certificacion_emitida
+FOR EACH ROW
+EXECUTE FUNCTION air.fn_asignar_folio_certificacion();
+
+
+
+-- ============================================================
+-- 5.3 Trigger de no repudio
+-- Bloquea UPDATE/DELETE directos sobre certificaciones emitidas
+-- ============================================================
+
+CREATE OR REPLACE FUNCTION air.fn_no_repudio_certificacion()
+RETURNS TRIGGER AS $$
+BEGIN
+
+    IF TG_OP = 'DELETE' THEN
+        RAISE EXCEPTION
+        'No se permite eliminar certificaciones emitidas. Operación bloqueada por no repudio.';
+    END IF;
+
+    IF TG_OP = 'UPDATE' THEN
+
+        IF COALESCE(current_setting('air.permitir_anulacion', true), 'false') <> 'true' THEN
+            RAISE EXCEPTION
+            'No se permite modificar certificaciones emitidas directamente. Use el proceso formal de anulación.';
+        END IF;
+
+        IF (
+            to_jsonb(NEW)
+                - 'estado'
+                - 'justificacion_anulacion'
+                - 'fecha_anulacion'
+                - 'anulado_por'
+        ) <> (
+            to_jsonb(OLD)
+                - 'estado'
+                - 'justificacion_anulacion'
+                - 'fecha_anulacion'
+                - 'anulado_por'
+        ) THEN
+            RAISE EXCEPTION
+            'No se permite alterar datos consolidados de la certificación.';
+        END IF;
+
+    END IF;
+
+    RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE TRIGGER tg_no_repudio_cert
+BEFORE UPDATE OR DELETE
+ON air.certificacion_emitida
+FOR EACH ROW
+EXECUTE FUNCTION air.fn_no_repudio_certificacion();
+
+
+
+-- ============================================================
+-- 6.2 Función de anulación con justificación legal
+-- ============================================================
+
+CREATE OR REPLACE FUNCTION air.sp_anular_certificacion(
+    p_folio VARCHAR,
+    p_justificacion TEXT,
+    p_id_usuario INTEGER DEFAULT 1
+)
+RETURNS TABLE (
+    folio VARCHAR,
+    estado VARCHAR,
+    justificacion TEXT,
+    fecha_anulacion TIMESTAMP
+)
+AS $$
+DECLARE
+    v_id_certificacion INTEGER;
+BEGIN
+
+    IF p_justificacion IS NULL OR LENGTH(TRIM(p_justificacion)) = 0 THEN
+        RAISE EXCEPTION
+        'Debe indicar una justificación legal para anular la certificación.';
+    END IF;
+
+    SELECT c.id_certificacion
+    INTO v_id_certificacion
+    FROM air.certificacion_emitida c
+    WHERE c.folio = p_folio;
+
+    IF v_id_certificacion IS NULL THEN
+        RAISE EXCEPTION
+        'No existe una certificación con el folio indicado: %', p_folio;
+    END IF;
+
+    PERFORM set_config('air.permitir_anulacion', 'true', true);
+
+    UPDATE air.certificacion_emitida
+    SET
+        estado = 'ANULADO',
+        justificacion_anulacion = p_justificacion,
+        fecha_anulacion = NOW(),
+        anulado_por = p_id_usuario
+    WHERE id_certificacion = v_id_certificacion;
+
+    INSERT INTO air.sys_log_auditoria (
+        id_usuario,
+        accion,
+        tabla_afectada,
+        detalle,
+        registro_id
+    )
+    VALUES (
+        p_id_usuario,
+        'ANULACION',
+        'certificacion_emitida',
+        'Certificación anulada con justificación legal. Folio: ' || p_folio,
+        v_id_certificacion
+    );
+
+    RETURN QUERY
+    SELECT
+        c.folio,
+        c.estado,
+        c.justificacion_anulacion,
+        c.fecha_anulacion
+    FROM air.certificacion_emitida c
+    WHERE c.id_certificacion = v_id_certificacion;
+
+END;
+$$ LANGUAGE plpgsql;
+
+
+
+-- ============================================================
+-- 6.3 Vista de validación externa por folio
+-- Simula consulta externa o QR mediante URL
+-- ============================================================
+
+CREATE OR REPLACE VIEW air.vw_validacion_externa_certificacion AS
+SELECT
+    id_certificacion,
+    folio,
+    estado,
+    hash_seguridad,
+    fecha_emision,
+    fecha_anulacion,
+    CASE
+        WHEN estado = 'ANULADO'
+            THEN 'Documento ANULADO'
+        ELSE 'Documento VÁLIDO'
+    END AS resultado_validacion,
+    'https://air.local/validar-certificado?folio=' || folio
+        AS url_validacion
+FROM air.certificacion_emitida;
